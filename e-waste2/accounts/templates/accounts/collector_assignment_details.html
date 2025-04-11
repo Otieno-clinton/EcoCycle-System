@@ -1,0 +1,355 @@
+<!-- collector_assignment_details.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assignment Details - Collector Panel</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2980b9;
+            --secondary: #3498db;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            background: var(--primary);
+            color: white;
+            padding: 20px 0;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+        
+        .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .sidebar-menu {
+            margin-top: 20px;
+        }
+        
+        .menu-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            color: white;
+            text-decoration: none;
+        }
+        
+        .menu-item:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        
+        .menu-item.active {
+            background: var(--secondary);
+        }
+        
+        .menu-item i {
+            margin-right: 10px;
+        }
+        
+        /* Main Content Styles */
+        .main-content {
+            padding: 20px;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .detail-row {
+            display: flex;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #f0f0f0;
+            padding-bottom: 15px;
+        }
+        
+        .detail-label {
+            flex: 0 0 200px;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        .detail-value {
+            flex: 1;
+        }
+        
+        .btn {
+            padding: 8px 15px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        
+        .btn-warning {
+            background: var(--warning);
+            color: white;
+        }
+        
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+        
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            display: inline-block;
+        }
+        
+        .status-assigned {
+            background: #cce5ff;
+            color: #004085;
+        }
+        
+        .status-collected {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .action-buttons {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .map-container {
+            height: 300px;
+            background-color: #eee;
+            border-radius: 8px;
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+<!-- Sidebar -->
+<div class="sidebar" style="background-color: #16a085; color: white; padding: 20px 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+    <div class="sidebar-header" style="padding: 0 20px 20px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+        <h2 style="color: white; font-size: 24px;"><i class="fas fa-truck"></i> Collector Panel</h2>
+    </div>
+    <div class="sidebar-menu" style="margin-top: 20px;">
+        <a href="{% url 'accounts:collector_dashboard' %}" 
+           class="menu-item {% if request.resolver_match.url_name == 'collector_dashboard' %}active{% endif %}"
+           style="padding: 12px 20px; color: white; text-decoration: none; display: flex; align-items: center; {% if request.resolver_match.url_name == 'collector_dashboard' %}background-color: #1abc9c;{% endif %}">
+            <i class="fas fa-tachometer-alt" style="margin-right: 10px;"></i> Dashboard
+        </a>
+
+        <a href="{% url 'accounts:collector_assignments' %}" 
+           class="menu-item {% if request.resolver_match.url_name == 'collector_assignments' %}active{% endif %}"
+           style="padding: 12px 20px; color: white; text-decoration: none; display: flex; align-items: center; {% if request.resolver_match.url_name == 'collector_assignments' %}background-color: #1abc9c;{% endif %}">
+            <i class="fas fa-tasks" style="margin-right: 10px;"></i> My Assignments
+        </a>
+
+        <a href="{% url 'accounts:recycling_log' %}" 
+           class="menu-item {% if request.resolver_match.url_name == 'recycling_log' %}active{% endif %}"
+           style="padding: 12px 20px; color: white; text-decoration: none; display: flex; align-items: center; {% if request.resolver_match.url_name == 'recycling_log' %}background-color: #1abc9c;{% endif %}">
+            <i class="fas fa-recycle" style="margin-right: 10px;"></i> Recycling Log
+        </a>
+
+        <a href="{% url 'accounts:logout' %}" 
+           class="menu-item"
+           style="padding: 12px 20px; color: white; text-decoration: none; display: flex; align-items: center;">
+            <i class="fas fa-sign-out-alt" style="margin-right: 10px;"></i> Logout
+        </a>
+    </div>
+</div>
+
+<!-- Main Content -->
+<div class="main-content">
+    <div class="header">
+        <h1><i class="fas fa-clipboard-check"></i> Assignment Details</h1>
+        <div>
+            <span>Welcome, {{ request.user.username }}</span>
+            <a href="{% url 'accounts:logout' %}" class="btn btn-primary" style="margin-left: 15px;">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        </div>
+    </div>
+
+    <!-- Navigation Links -->
+    <div class="card">
+        <div class="card-header">
+            <div>
+                <a href="{% url 'accounts:collector_assignments' %}" class="btn btn-primary btn-sm">
+                    <i class="fas fa-arrow-left"></i> Back to Assignments
+                </a>
+            </div>
+            <div>
+                <span class="status-badge status-{{ request.status }}">
+                    {{ request.get_status_display }}
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Producer Details -->
+    <div class="card">
+        <div class="card-header">
+            <h2><i class="fas fa-user"></i> Producer Information</h2>
+        </div>
+        <div class="detail-row">
+            <div class="detail-label">Name:</div>
+            <div class="detail-value">{{ request.producer.username }}</div>
+        </div>
+        <div class="detail-row">
+            <div class="detail-label">Contact Email:</div>
+            <div class="detail-value">{{ request.producer.email }}</div>
+        </div>
+        <div class="detail-row">
+            <div class="detail-label">Account Created:</div>
+            <div class="detail-value">{{ request.producer.date_joined|date:"F d, Y" }}</div>
+        </div>
+        {% if request.producer.phone_number %}
+        <div class="detail-row">
+            <div class="detail-label">Phone Number:</div>
+            <div class="detail-value">{{ request.producer.phone_number }}</div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Waste Details -->
+    <div class="card">
+        <div class="card-header">
+            <h2><i class="fas fa-trash"></i> Waste Details</h2>
+        </div>
+        <div class="detail-row">
+            <div class="detail-label">Waste Type:</div>
+            <div class="detail-value">{{ request.get_waste_type_display }}</div>
+        </div>
+        <div class="detail-row">
+            <div class="detail-label">Quantity:</div>
+            <div class="detail-value">{{ request.quantity }}</div>
+        </div>
+        <div class="detail-row">
+            <div class="detail-label">Request Date:</div>
+            <div class="detail-value">{{ request.request_date|date:"F d, Y" }}</div>
+        </div>
+        <div class="detail-row">
+            <div class="detail-label">Scheduled Collection:</div>
+            <div class="detail-value">{{ request.collection_date|date:"F d, Y" }}</div>
+        </div>
+        {% if request.description %}
+        <div class="detail-row">
+            <div class="detail-label">Description:</div>
+            <div class="detail-value">{{ request.description }}</div>
+        </div>
+        {% endif %}
+        {% if request.admin_notes %}
+        <div class="detail-row">
+            <div class="detail-label">Admin Notes:</div>
+            <div class="detail-value">{{ request.admin_notes }}</div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Collection Location -->
+    <div class="card">
+        <div class="card-header">
+            <h2><i class="fas fa-map-marker-alt"></i> Collection Location</h2>
+        </div>
+        {% if request.collection_address %}
+        <div class="detail-row">
+            <div class="detail-label">Address:</div>
+            <div class="detail-value">{{ request.collection_address }}</div>
+        </div>
+        {% endif %}
+        {% if request.latitude and request.longitude %}
+        <div class="map-container">
+            <p>Map would be displayed here using coordinates: {{ request.latitude }}, {{ request.longitude }}</p>
+        </div>
+        {% else %}
+        <div class="map-container">
+            <p>No location coordinates available</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="card">
+        <div class="card-header">
+            <h2><i class="fas fa-cogs"></i> Actions</h2>
+        </div>
+        <div class="action-buttons">
+            {% if request.status == 'assigned' %}
+            <a href="{% url 'accounts:update_status' request.id %}?status=collected" class="btn btn-success">
+                <i class="fas fa-check"></i> Mark as Collected
+            </a>
+            {% elif request.status == 'collected' %}
+            <a href="{% url 'accounts:recycling_log' %}" class="btn btn-primary">
+                <i class="fas fa-recycle"></i> Log Recycling Details
+            </a>
+            {% endif %}
+            <a href="{% url 'accounts:collector_assignments' %}" class="btn btn-warning">
+                <i class="fas fa-times"></i> Cancel
+            </a>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

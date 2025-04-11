@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify Payment | E-Waste System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #16a085;
+            --secondary: #1abc9c;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --info: #17a2b8;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --success: #28a745;
+            --gray: #6c757d;
+            --light-gray: #f8f9fa;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            background: var(--primary);
+            color: white;
+            padding: 20px 0;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+        
+        .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .sidebar-menu {
+            margin-top: 20px;
+        }
+        
+        .menu-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            color: white;
+            text-decoration: none;
+        }
+        
+        .menu-item:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        
+        .menu-item.active {
+            background: var(--secondary);
+        }
+        
+        .menu-item i {
+            margin-right: 10px;
+        }
+        
+        /* Main Content Styles */
+        .main-content {
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #ddd;
+            position: absolute;
+            top: 20px;
+            left: 270px;
+            right: 20px;
+        }
+        
+        .payment-container {
+            max-width: 800px;
+            width: 100%;
+            padding: 20px;
+            margin-top: 70px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .card-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .card-header h2 {
+            color: var(--primary);
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+        
+        .card-header i {
+            font-size: 3rem;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+        
+        .card-body {
+            padding: 0 20px;
+        }
+        
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            background-color: #e2f3f5;
+            border-left: 5px solid var(--primary);
+        }
+        
+        .alert h5 {
+            color: var(--primary);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .alert p {
+            margin-bottom: 5px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 500;
+            color: var(--dark);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(22, 160, 133, 0.2);
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 16px;
+        }
+        
+        .form-actions .btn {
+            width: auto;
+        }
+        
+        .card-body .btn {
+            width: 100%;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+        }
+        
+        .text-muted {
+            color: var(--gray);
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        
+        .payment-details {
+            background: var(--light-gray);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+        }
+        
+        .payment-details p {
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .payment-details p strong {
+            color: var(--dark);
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2><i class="fas fa-user"></i> Producer Panel</h2>
+        </div>
+        <div class="sidebar-menu">
+            <a href="{% url 'accounts:producer_dashboard' %}" class="menu-item {% if request.resolver_match.url_name == 'producer_dashboard' %}active{% endif %}">
+                <i class="fas fa-tachometer-alt"></i> Dashboard
+            </a>
+            <a href="{% url 'accounts:new_request' %}" class="menu-item {% if request.resolver_match.url_name == 'create_request' %}active{% endif %}">
+                <i class="fas fa-plus-circle"></i> New Request
+            </a>
+            <a href="{% url 'accounts:producer_dashboard' %}" class="menu-item {% if request.resolver_match.url_name == 'request_list' %}active{% endif %}">
+                <i class="fas fa-history"></i> History
+            </a>
+            <a href="{% url 'accounts:producer_payment_list' %}" class="menu-item">
+                <i class="fas fa-money-bill-wave"></i> Payments
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="header">
+            <h1>Verify Payment</h1>
+            <div>
+                <span>Welcome, {{ request.user.username }}</span>
+                <form action="{% url 'accounts:logout' %}" method="post" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary" style="margin-left: 15px;">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="payment-container">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-check-circle"></i>
+                    <h2>Verify Your Payment</h2>
+                    <p class="text-muted">Please complete the payment verification process</p>
+                </div>
+                
+                <div class="card-body">
+                    <div class="alert">
+                        <h5><i class="fas fa-mobile-alt"></i> Complete Payment on Your Phone</h5>
+                        <p>You should receive an M-Pesa STK push on your phone</p>
+                        <p class="text-muted">If you don't receive the prompt within 30 seconds, please try again</p>
+                    </div>
+                    
+                    <div class="payment-details">
+                        <p><strong>Amount:</strong> KES {{ payment.amount|floatformat:2 }}</p>
+                        <p><strong>Phone Number:</strong> {{ payment.phone_number }}</p>
+                        <p><strong>Request ID:</strong> {{ payment.request.id }}</p>
+                    </div>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="mpesa_code">
+                                <i class="fas fa-receipt"></i> M-Pesa Transaction Code
+                            </label>
+                            <input type="text" class="form-control" id="mpesa_code" name="mpesa_code" 
+                                placeholder="Enter the M-Pesa code you received" required>
+                            <p class="text-muted">Example: NLJ7RT56</p>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane"></i> Submit Verification
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

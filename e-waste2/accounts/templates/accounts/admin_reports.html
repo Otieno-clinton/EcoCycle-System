@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Reports</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+                :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --success: #27ae60;
+            --danger: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            background: var(--primary);
+            color: white;
+            padding: 20px 0;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+        
+        .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .sidebar-menu {
+            margin-top: 20px;
+        }
+        
+        .menu-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+        }
+        
+        .menu-item:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        
+        .menu-item.active {
+            background: var(--secondary);
+        }
+        
+        .menu-item i {
+            margin-right: 10px;
+        }
+        
+        /* Main Content Styles */
+        .main-content {
+            padding: 20px;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .btn {
+            padding: 8px 15px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+        
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+        
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-approved {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-assigned {
+            background: #cce5ff;
+            color: #004085;
+        }
+        .status-recycled {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-landfill {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .export-btn {
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+<!-- Sidebar -->
+<div class="sidebar" style="background-color: #16a085; color: white; padding: 20px 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+    <div class="sidebar-header" style="padding: 0 20px 20px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+        <h2 style="color: white; font-size: 24px;"><i class="fas fa-recycle"></i> E-Waste Admin</h2>
+    </div>
+    <div class="sidebar-menu" style="margin-top: 20px;">
+        <a href="{% url 'accounts:admin_dashboard' %}" 
+           class="menu-item {% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}" 
+           style="padding: 12px 20px; display: flex; align-items: center; color: white; text-decoration: none; {% if request.resolver_match.url_name == 'admin_dashboard' %}background-color: #1abc9c;{% endif %}">
+            <i class="fas fa-tachometer-alt" style="margin-right: 10px;"></i> Dashboard
+        </a>
+
+        <a href="{% url 'accounts:request_list' %}" 
+           class="menu-item {% if request.resolver_match.url_name == 'request_list' %}active{% endif %}" 
+           style="padding: 12px 20px; display: flex; align-items: center; color: white; text-decoration: none; {% if request.resolver_match.url_name == 'request_list' %}background-color: #1abc9c;{% endif %}">
+            <i class="fas fa-clipboard-list" style="margin-right: 10px;"></i> Collection Requests
+        </a>
+
+        <a href="{% url 'accounts:admin_reports' %}" 
+           class="menu-item {% if request.resolver_match.url_name == 'admin_reports' %}active{% endif %}" 
+           style="padding: 12px 20px; display: flex; align-items: center; color: white; text-decoration: none; {% if request.resolver_match.url_name == 'admin_reports' %}background-color: #1abc9c;{% endif %}">
+            <i class="fas fa-chart-bar" style="margin-right: 10px;"></i> Reports
+        </a>
+
+        <a href="{% url 'accounts:logout' %}" 
+           class="menu-item {% if 'admin/payments' in request.path %}active{% endif %}" 
+           style="padding: 12px 20px; display: flex; align-items: center; color: white; text-decoration: none; {% if 'admin/payments' in request.path %}background-color: #1abc9c;{% endif %}">
+            <i class="fas fa-money-bill-wave" style="margin-right: 10px;"></i> Logout
+        </a>
+    </div>
+</div>
+
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="header">
+            <h1>Recycling Reports</h1>
+            <div>
+                <span>Welcome, {{ request.user.username }}</span>
+                <a href="{% url 'accounts:logout' %}" class="btn btn-danger" style="margin-left: 15px;">Logout</a>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="card">
+            <form method="get" class="filter-form">
+
+                
+                
+                <div class="form-group" style="align-self: flex-end;">
+                    <a href="?export=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}" 
+                       class="btn btn-success export-btn">
+                        <i class="fas fa-download"></i> Export CSV
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Reports Table -->
+        <div class="card">
+            <div class="card-header">
+                <h2><i class="fas fa-file-alt"></i> Recycling Reports</h2>
+            </div>
+            
+            {% if reports %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Producer</th>
+                        <th>Collector</th>
+                        <th>Waste Type</th>
+                        <th>Quantity</th>
+                        <th>Disposition</th>
+                        <th>Recycling Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for report in reports %}
+                    <tr>
+                        <td>#{{ report.id }}</td>
+                        <td>{{ report.producer.username }}</td>
+                        <td>{{ report.collector.username }}</td>
+                        <td>{{ report.get_waste_type_display }}</td>
+                        <td>{{ report.actual_quantity }} of {{ report.quantity }}</td>
+                        <td>{{ report.get_final_disposition_display }}</td>
+                        <td>{{ report.recycling_date|date:"M d, Y" }}</td>
+                        <td>
+                            <span class="status-badge status-{{ report.status }}">
+                                {{ report.get_status_display }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p style="padding: 20px; text-align: center;">No reports found</p>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

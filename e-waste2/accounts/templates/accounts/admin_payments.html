@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Payments | E-Waste System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --info: #17a2b8;
+            --warning: #ffc107;
+            --danger: #e74c3c;
+            --success: #27ae60;
+            --gray: #6c757d;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            background: #16a085;
+            color: white;
+            padding: 20px 0;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+        
+        .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .sidebar-menu {
+            margin-top: 20px;
+        }
+        
+        .menu-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            color: white;
+            text-decoration: none;
+        }
+        
+        .menu-item:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        
+        .menu-item.active {
+            background: #1abc9c;
+        }
+        
+        .menu-item i {
+            margin-right: 10px;
+        }
+        
+        /* Main Content Styles */
+        .main-content {
+            padding: 20px;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .header h1 {
+            color: var(--primary);
+        }
+        
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+            margin-bottom: 25px;
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .card-header h2 {
+            color: var(--dark);
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .table th, .table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .badge-pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        
+        .badge-completed {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .badge-failed {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .badge-verified {
+            background-color: #cfe2ff;
+            color: #084298;
+        }
+        
+        .btn {
+            padding: 8px 15px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 14px;
+        }
+        
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+        
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+        
+        .btn-info {
+            background: var(--info);
+            color: white;
+        }
+        
+        .action-btns {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: var(--gray);
+        }
+        
+        .empty-state i {
+            font-size: 50px;
+            margin-bottom: 20px;
+            color: #dee2e6;
+        }
+        
+        .payment-detail-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.6);
+        }
+        
+        .modal-content {
+            background-color: #f8f9fa;
+            margin: 10% auto;
+            padding: 25px;
+            border-radius: 8px;
+            width: 50%;
+            max-width: 600px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            position: relative;
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 20px;
+            cursor: pointer;
+            color: var(--gray);
+        }
+        
+        .payment-details-container {
+            margin-top: 20px;
+        }
+        
+        .detail-row {
+            display: flex;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .detail-label {
+            flex-basis: 40%;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .detail-value {
+            flex-basis: 60%;
+        }
+        
+        .modal-actions {
+            margin-top: 25px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        
+        /* Filters */
+        .filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-item {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .filter-label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+        
+        .filter-select, .filter-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .filter-actions {
+            display: flex;
+            align-items: flex-end;
+            gap: 10px;
+        }
+        
+        .receipt-code {
+            font-family: monospace;
+            font-weight: bold;
+            background-color: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 4px;
+            border: 1px solid #eee;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2><i class="fas fa-recycle"></i> E-Waste Admin</h2>
+        </div>
+        <div class="sidebar-menu">
+            <a href="{% url 'accounts:admin_dashboard' %}" 
+               class="menu-item {% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}">
+                <i class="fas fa-tachometer-alt"></i> Dashboard
+            </a>
+
+            <a href="{% url 'accounts:request_list' %}" 
+               class="menu-item {% if request.resolver_match.url_name == 'request_list' %}active{% endif %}">
+                <i class="fas fa-clipboard-list"></i> Collection Requests
+            </a>
+
+            <a href="{% url 'accounts:admin_reports' %}" 
+               class="menu-item {% if request.resolver_match.url_name == 'admin_reports' %}active{% endif %}">
+                <i class="fas fa-chart-bar"></i> Reports
+            </a>
+
+            <a href="{% url 'accounts:logout' %}" 
+               class="menu-item {% if 'admin/payments' in request.path %}active{% endif %}">
+                <i class="fas fa-money-bill-wave"></i> Logout
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="header">
+            <h1><i class="fas fa-money-bill-wave"></i> Payment Approvals</h1>
+            <div>
+                <span>Welcome, {{ request.user.username }}</span>
+                <form action="{% url 'accounts:logout' %}" method="post" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger" style="margin-left: 15px;">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Messages -->
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="alert {% if message.tags == 'success' %}alert-success{% elif message.tags == 'error' %}alert-danger{% else %}alert-info{% endif %}" 
+                 style="margin-bottom: 20px; padding: 15px; border-radius: 4px; 
+                        {% if message.tags == 'success' %}background-color: #d4edda; color: #155724;{% elif message.tags == 'error' %}background-color: #f8d7da; color: #721c24;{% else %}background-color: #e2f3f5; color: #0c5460;{% endif %}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        <!-- Filters -->
+        <div class="card">
+            <div class="card-header">
+                <h2><i class="fas fa-filter"></i> Filter Payments</h2>
+            </div>
+            <div class="filters">
+                <form method="get" action="{% url 'accounts:admin_payments' %}" class="d-flex w-100">
+                    <div class="filter-item">
+                        <label class="filter-label" for="status">Status</label>
+                        <select class="filter-select" id="status" name="status">
+                            <option value="">All Statuses</option>
+                            <option value="pending" {% if request.GET.status == 'pending' %}selected{% endif %}>Pending</option>
+                            <option value="completed" {% if request.GET.status == 'completed' %}selected{% endif %}>Completed</option>
+                            <option value="failed" {% if request.GET.status == 'failed' %}selected{% endif %}>Failed</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <label class="filter-label" for="date_from">From Date</label>
+                        <input type="date" class="filter-input" id="date_from" name="date_from" value="{{ request.GET.date_from }}">
+                    </div>
+                    <div class="filter-item">
+                        <label class="filter-label" for="date_to">To Date</label>
+                        <input type="date" class="filter-input" id="date_to" name="date_to" value="{{ request.GET.date_to }}">
+                    </div>
+                    <div class="filter-actions">
+                        <button type="submit" class="btn btn-info">
+                            <i class="fas fa-search"></i> Apply Filters
+                        </button>
+                        <a href="{% url 'accounts:admin_payments' %}" class="btn btn-danger">
+                            <i class="fas fa-times"></i> Clear
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h2><i class="fas fa-clock"></i> Pending Approvals</h2>
+            </div>
+            
+            {% if pending_payments %}
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Request</th>
+                            <th>Producer</th>
+                            <th>Amount</th>
+                            <th>Phone</th>
+                            <th>M-Pesa Code</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for payment in pending_payments %}
+                        <tr>
+                            <td>#{{ payment.id }}</td>
+                            <td>Request #{{ payment.request.id }}</td>
+                            <td>{{ payment.request.producer.username }}</td>
+                            <td>KES {{ payment.amount|floatformat:2 }}</td>
+                            <td>{{ payment.phone_number }}</td>
+                            <td><span class="receipt-code">{{ payment.mpesa_receipt_number }}</span></td>
+                            <td>{{ payment.created_at|date:"M d, Y" }}</td>
+                            <td>
+                                <span class="badge {% if payment.verified %}badge-verified{% else %}badge-pending{% endif %}">
+                                    {% if payment.verified %}Verified{% else %}Pending{% endif %}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="action-btns">
+                                    <a href="{% url 'accounts:approve_payment' payment.id %}" class="btn btn-success btn-sm">
+                                        <i class="fas fa-check"></i> Approve
+                                    </a>
+                                    <a href="{% url 'accounts:reject_payment' payment.id %}" class="btn btn-danger btn-sm">
+                                        <i class="fas fa-times"></i> Reject
+                                    </a>
+                                    <button onclick="showPaymentDetails({{ payment.id }})" class="btn btn-info btn-sm">
+                                        <i class="fas fa-eye"></i> View
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <i class="fas fa-check-circle"></i>
+                <h3>No Payments Pending Approval</h3>
+                <p>All payments have been processed</p>
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h2><i class="fas fa-history"></i> Payment History</h2>
+            </div>
+            
+            {% if payment_history %}
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Request</th>
+                            <th>Producer</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>M-Pesa Code</th>
+                            <th>Date</th>
+                            <th>Approved</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for payment in payment_history %}
+                        <tr>
+                            <td>#{{ payment.id }}</td>
+                            <td>Request #{{ payment.request.id }}</td>
+                            <td>{{ payment.request.producer.username }}</td>
+                            <td>KES {{ payment.amount|floatformat:2 }}</td>
+                            <td>
+                                <span class="badge {% if payment.status == 'completed' %}badge-completed{% else %}badge-failed{% endif %}">
+                                    {{ payment.get_status_display }}
+                                </span>
+                            </td>
+                            <td><span class="receipt-code">{{ payment.mpesa_receipt_number|default:"N/A" }}</span></td>
+                            <td>{{ payment.created_at|date:"M d, Y" }}</td>
+                            <td>
+                                {% if payment.admin_approved %}
+                                <i class="fas fa-check-circle" style="color: #27ae60;"></i>
+                                {% else %}
+                                <i class="fas fa-times-circle" style="color: #e74c3c;"></i>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <button onclick="showPaymentDetails({{ payment.id }})" class="btn btn-info btn-sm">
+                                    <i class="fas fa-eye"></i> View
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <i class="fas fa-inbox"></i>
+                <h3>No Payment History</h3>
+                <p>Payment records will appear here</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Payment Details Modal -->
+    <div id="paymentDetailsModal" class="payment-detail-modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <h2><i class="fas fa-receipt"></i> Payment Details</h2>
+            
+            <div class="payment-details-container" id="paymentDetailsContent">
+                <!-- Payment details will be loaded here -->
+                <div class="detail-row">
+                    <div class="detail-label">Payment ID:</div>
+                    <div class="detail-value" id="modal-payment-id"></div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Request ID:</div>
+                    <div class="detail-value" id="modal-request-id"></div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Producer:</div>
+                    <div class="detail-value" id="modal-producer"></div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Amount:</div>
+                    <div class="detail-value" id="modal-amount"></div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Phone Number:</div>
+                    <div class="detail-value" id="modal-phone"></div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">M-Pesa Code:</div>
+                    <div class="detail-value" id="modal-mpesa-code"></div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Status:</div>
+                    <div class="detail-value" id="modal-status"></div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Created Date:</div>
+                    <div class="detail-value" id="modal-created-date"></div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Admin Approved:</div>
+                    <div class="detail-value" id="modal-admin-approved"></div>
+                </div>
+            </div>
+            
+            <div class="modal-actions" id="modal-actions">
+                <!-- Action buttons will be added here dynamically -->
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Payment details modal functionality
+        function showPaymentDetails(paymentId) {
+            // In a real implementation, you would fetch the payment details via AJAX
+            // For this demonstration, we'll simulate showing the details modal
+            
+            // Find the payment data from the table
+            const paymentRows = document.querySelectorAll('.table tbody tr');
+            let paymentData = null;
+            
+            for (let row of paymentRows) {
+                const idCell = row.cells[0].textContent;
+                if (idCell === `#${paymentId}`) {
+                    paymentData = {
+                        id: paymentId,
+                        requestId: row.cells[1].textContent.replace('Request #', ''),
+                        producer: row.cells[2].textContent,
+                        amount: row.cells[3].textContent,
+                        phone: row.cells[4]?.textContent || 'N/A',
+                        mpesaCode: row.cells[5]?.textContent || row.cells[5]?.textContent || 'N/A',
+                        status: row.querySelector('.badge')?.textContent || 'Unknown',
+                        date: row.cells[6]?.textContent || row.cells[6]?.textContent || 'N/A',
+                        approved: row.querySelector('.fa-check-circle') !== null
+                    };
+                    break;
+                }
+            }
+            
+            if (paymentData) {
+                // Populate modal with payment data
+                document.getElementById('modal-payment-id').textContent = `#${paymentData.id}`;
+                document.getElementById('modal-request-id').textContent = `Request #${paymentData.requestId}`;
+                document.getElementById('modal-producer').textContent = paymentData.producer;
+                document.getElementById('modal-amount').textContent = paymentData.amount;
+                document.getElementById('modal-phone').textContent = paymentData.phone;
+                document.getElementById('modal-mpesa-code').textContent = paymentData.mpesaCode;
+                document.getElementById('modal-status').textContent = paymentData.status;
+                document.getElementById('modal-created-date').textContent = paymentData.date;
+                document.getElementById('modal-admin-approved').textContent = paymentData.approved ? 'Yes' : 'No';
+                
+                // Add action buttons if the payment is pending approval
+                const actionsContainer = document.getElementById('modal-actions');
+                actionsContainer.innerHTML = '';
+                
+                if (paymentData.status.toLowerCase().includes('pending') || 
+                    paymentData.status.toLowerCase().includes('verified')) {
+                    actionsContainer.innerHTML = `
+                        <a href="{% url 'accounts:admin_payments' %}" class="btn btn-info">
+                            <i class="fas fa-times"></i> Close
+                        </a>
+                        <a href="{% url 'accounts:approve_payment' 0 %}".replace('0', paymentData.id) class="btn btn-success">
+                            <i class="fas fa-check"></i> Approve Payment
+                        </a>
+                        <a href="{% url 'accounts:reject_payment' 0 %}".replace('0', paymentData.id) class="btn btn-danger">
+                            <i class="fas fa-times"></i> Reject Payment
+                        </a>
+                    `;
+                } else {
+                    actionsContainer.innerHTML = `
+                        <a href="{% url 'accounts:admin_payments' %}" class="btn btn-info">
+                            <i class="fas fa-times"></i> Close
+                        </a>
+                    `;
+                }
+                
+                // Show the modal
+                document.getElementById('paymentDetailsModal').style.display = 'block';
+            }
+        }
+        
+        function closeModal() {
+            document.getElementById('paymentDetailsModal').style.display = 'none';
+        }
+        
+        // Close the modal if clicked outside of it
+        window.onclick = function(event) {
+            const modal = document.getElementById('paymentDetailsModal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recycling Log</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2980b9;
+            --secondary: #3498db;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            background: var(--primary);
+            color: white;
+            padding: 20px 0;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+        
+        .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .sidebar-menu {
+            margin-top: 20px;
+        }
+        
+        .menu-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            color: white;
+            text-decoration: none;
+        }
+        
+        .menu-item:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        
+        .menu-item.active {
+            background: var(--secondary);
+        }
+        
+        .menu-item i {
+            margin-right: 10px;
+        }
+        
+        /* Main Content Styles */
+        .main-content {
+            padding: 20px;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .btn {
+            padding: 8px 15px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        
+        .btn-warning {
+            background: var(--warning);
+            color: white;
+        }
+        
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+        
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-collected {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-recycled {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-landfill {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        textarea {
+            min-height: 100px;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 20px;
+            border-radius: 8px;
+            width: 50%;
+            max-width: 600px;
+        }
+        
+        .close {
+            float: right;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        
+        .filter-form {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .filter-form input, .filter-form select {
+            padding: 8px;
+        }
+    </style>
+</head>
+<body>
+<!-- Sidebar -->
+<!-- Sidebar -->
+<div class="sidebar" style="background-color: #16a085; color: white; padding: 20px 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+    <div class="sidebar-header" style="padding: 0 20px 20px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+        <h2 style="color: white; font-size: 24px;"><i class="fas fa-truck"></i> Collector Panel</h2>
+    </div>
+    <div class="sidebar-menu" style="margin-top: 20px;">
+        <a href="{% url 'accounts:collector_dashboard' %}" 
+           class="menu-item {% if request.resolver_match.url_name == 'collector_dashboard' %}active{% endif %}"
+           style="padding: 12px 20px; color: white; text-decoration: none; display: flex; align-items: center; {% if request.resolver_match.url_name == 'collector_dashboard' %}background-color: #1abc9c;{% endif %}">
+            <i class="fas fa-tachometer-alt" style="margin-right: 10px;"></i> Dashboard
+        </a>
+
+        <a href="{% url 'accounts:collector_assignments' %}" 
+           class="menu-item {% if request.resolver_match.url_name == 'collector_assignments' %}active{% endif %}"
+           style="padding: 12px 20px; color: white; text-decoration: none; display: flex; align-items: center; {% if request.resolver_match.url_name == 'collector_assignments' %}background-color: #1abc9c;{% endif %}">
+            <i class="fas fa-tasks" style="margin-right: 10px;"></i> My Assignments
+        </a>
+
+        <a href="{% url 'accounts:recycling_log' %}" 
+           class="menu-item {% if request.resolver_match.url_name == 'recycling_log' %}active{% endif %}"
+           style="padding: 12px 20px; color: white; text-decoration: none; display: flex; align-items: center; {% if request.resolver_match.url_name == 'recycling_log' %}background-color: #1abc9c;{% endif %}">
+            <i class="fas fa-recycle" style="margin-right: 10px;"></i> Recycling Log
+        </a>
+
+        <a href="{% url 'accounts:logout' %}" 
+           class="menu-item"
+           style="padding: 12px 20px; color: white; text-decoration: none; display: flex; align-items: center;">
+            <i class="fas fa-sign-out-alt" style="margin-right: 10px;"></i> Logout
+        </a>
+    </div>
+</div>
+
+
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="header">
+            <h1>Recycling Log</h1>
+            <div>
+                <span>Welcome, {{ request.user.username }}</span>
+                <a href="{% url 'accounts:logout' %}" class="btn btn-primary" style="margin-left: 15px;">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
+        </div>
+
+        <!-- Pending Logs -->
+        <div class="card">
+            <div class="card-header">
+                <h2><i class="fas fa-clock"></i> Pending Recycling Logs</h2>
+            </div>
+            {% if pending_logs %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Waste Type</th>
+                        <th>Quantity</th>
+                        <th>Collection Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in pending_logs %}
+                    <tr>
+                        <td>#{{ log.id }}</td>
+                        <td>{{ log.get_waste_type_display }}</td>
+                        <td>{{ log.quantity }}</td>
+                        <td>{{ log.collection_date|date:"M d, Y" }}</td>
+                        <td><span class="status-badge status-collected">{{ log.get_status_display }}</span></td>
+                        <td>
+                            <button onclick="openLogModal({{ log.id }})" class="btn btn-primary btn-sm">
+                                <i class="fas fa-edit"></i> Log Disposition
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p style="padding: 20px; text-align: center;">No pending recycling logs</p>
+            {% endif %}
+        </div>
+
+        <!-- Completed Logs -->
+        <div class="card">
+            <div class="card-header">
+                <h2><i class="fas fa-check-circle"></i> Completed Recycling Logs</h2>
+            </div>
+            {% if completed_logs %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Waste Type</th>
+                        <th>Quantity</th>
+                        <th>Final Disposition</th>
+                        <th>Recycling Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in completed_logs %}
+                    <tr>
+                        <td>#{{ log.id }}</td>
+                        <td>{{ log.get_waste_type_display }}</td>
+                        <td>{{ log.actual_quantity }} of {{ log.quantity }}</td>
+                        <td>{{ log.get_final_disposition_display }}</td>
+                        <td>{{ log.recycling_date|date:"M d, Y" }}</td>
+                        <td>
+                            <span class="status-badge status-{{ log.status }}">
+                                {{ log.get_status_display }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p style="padding: 20px; text-align: center;">No completed recycling logs</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Log Modal -->
+    <div id="logModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2>Log Recycling Disposition</h2>
+            <form method="post" action="{% url 'accounts:recycling_log' %}">
+                {% csrf_token %}
+                <input type="hidden" name="request_id" id="modalRequestId">
+                
+                <div class="form-group">
+                    <label for="final_disposition">Final Disposition</label>
+                    <select name="final_disposition" id="final_disposition" required>
+                        <option value="">Select disposition</option>
+                        <option value="recycled">Recycled</option>
+                        <option value="landfill">Sent to Landfill</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="actual_quantity">Actual Quantity Processed</label>
+                    <input type="number" name="actual_quantity" id="actual_quantity" required min="1">
+                </div>
+                
+                <div class="form-group">
+                    <label for="recycling_notes">Notes</label>
+                    <textarea name="recycling_notes" id="recycling_notes"></textarea>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn btn-danger" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn btn-success">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function openLogModal(requestId) {
+            document.getElementById('modalRequestId').value = requestId;
+            document.getElementById('logModal').style.display = 'block';
+        }
+        
+        function closeModal() {
+            document.getElementById('logModal').style.display = 'none';
+        }
+        
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            if (event.target == document.getElementById('logModal')) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+</html>
